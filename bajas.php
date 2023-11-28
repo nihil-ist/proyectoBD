@@ -48,41 +48,36 @@
     <?php if($tabla_seleccionada){
         $conexion =mysqli_connect($servidor,$cuenta,$password,$bd);
         if(mysqli_connect_errno()){die("Error en la conexion");}
-        $sql = "select * from $tabla_seleccionada";//hacemos cadena con la sentencia mysql que consulta todo el contenido de la tabla
-        $resultado = $conexion -> query($sql); //aplicamos sentencia
-        $campos = $resultado->fetch_fields();
-        $sql_columnas = "SHOW COLUMNS FROM $tabla_seleccionada";
-        $resultado_columnas = $conn->query($sql_columnas);
-        $tablaSQL.="<table><tr>";
-        while ($fila = $resultado_columnas->fetch_assoc()) {
-            $tablaSQL.= "<label>" . $fila['Field'] . ":</label>";
-            echo "<input type='text' name='" . $fila['Field'] . "'><br>";
-        }
-
-        foreach ($resultado as $fila) {
-            // Imprime los datos de la fila
-            foreach ($campos as $campo) {
-                echo $fila[$campo->name]."\t";
+        $sql_data = "SELECT * FROM $tabla_seleccionada";
+        $result_data = $conexion->query($sql_data);
+        $bandera = false;
+        if ($result_data->num_rows > 0) {
+            echo "<table border='1' style='text-align:center;'><tr>";
+            while ($fieldinfo = $result_data->fetch_field()) {
+                if ($bandera === false){
+                    echo "<th>Eliminar</th>";
+                    $bandera = true;
+                }
+                echo "<th>" . $fieldinfo->name . "</th>";
             }
-            $tablaSQL.="</table>";
-            echo"$tablaSQL <br>";
+            echo "</tr>";
+            $bandera = false;
+            while ($row = $result_data->fetch_assoc()) {
+                echo "<tr>";
+                foreach ($row as $value) {
+                    if ($bandera === false){
+                        echo "<td><input type='checkbox' name='cEliminar[]' value=$value /></td>";
+                        $bandera = true;
+                    }
+                    echo "<td>" . $value . "</td>";
+                }
+                $bandera = false;
+                echo "</tr>";
+            }
+            echo "</table>";
         }
-        /*if ($resultado -> num_rows){ //si la consulta genera registros
-            $salida='<table>';
-               while( $fila = $resultado -> fetch_assoc() ){ //recorremos los registros obtenidos de la tabla
-                   echo '<option value="'.$fila["id"].'">'.$fila["nombre"].'</option>';
-                   //proceso de concatenacion de datos
-                   $salida.= '<tr>';
-                   $salida.= '<td>'. $fila['id'] . '</td>';
-                   $salida.= '<td>'. $fila['nombre'] . '</td>';
-                   $salida.= '<td>'. $fila['cuenta'] . '</td>';
-                   $salida.= '<td>'. $fila['contrasena'] . '</td>';
-                   $salida.= '</tr>';
-                   }//fin while   
-                   $salida.= '</table>';
-        }         */  
     }
-        ?>
+?>
 
         </form>
 </div>
