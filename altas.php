@@ -17,7 +17,9 @@ $resultado = $conn->query($sql);
 $tablas = array();
 if ($resultado->num_rows > 0) {
     while ($fila = $resultado->fetch_row()) {
-        $tablas[] = $fila[0];
+        if (strpos($fila[0], 'rel_') !== 0) {
+            $tablas[] = $fila[0];
+        }
     }
 }
 
